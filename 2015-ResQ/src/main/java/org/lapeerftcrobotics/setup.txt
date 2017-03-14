@@ -1,0 +1,135 @@
+--
+
+FileLogger
+
+--
+
+HiTechnicMotorController
+
+--
+
+Camera
+
+Step 1: Update Manifest
+
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-feature android:name="android.hardware.camera" />
+<uses-feature android:name="android.hardware.camera.front" />
+
+Step 2: Update res/layout/activity_ftc_controller.xml - add below textErrorMessage
+
+<FrameLayout
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/textErrorMessage"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/previewLayout">
+</FrameLayout>
+
+Step 3: Update FtcRobotControllerActivity
+
+add to onCreate() method and add under textErrorMessage
+
+    /** Added for Camera Preview **/
+    CameraHelper h = new CameraHelper(this);
+    h.openFrontFacingCamera();
+    h.initPreview((FrameLayout)findViewById(R.id.previewLayout));
+
+Step 4: Logger
+
+Create folder storage/emulated/legacy/Documents
+
+
+
+----------------------------------------------
+
+OpenCV
+
+1. Download OpenCV for Android
+
+- http://opencv.org/downloads.html
+
+- 2.4.11 on Workstation
+
+- 2.4.9 OpenCV Manager on Android
+
+2. create  folder ftc_app-master/libraries
+
+3. copy OpenCV-android-sdk/sdk/java to ftc_app-master/libraries
+
+4. rename ftc_app-master/libraries/java ftc_app-master/libraries/opencv
+
+5. create ftc_app-master/libraries/opencv/build.gradle file
+
+apply plugin: 'android-library'
+
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:1.2.3'
+  }
+}
+
+android {
+  compileSdkVersion 19
+  buildToolsVersion "19.1.0"
+
+  defaultConfig {
+    minSdkVersion 8
+    targetSdkVersion 19
+    versionCode 24110
+    versionName "2.4.11"
+  }
+
+  sourceSets {
+    main {
+      manifest.srcFile 'AndroidManifest.xml'
+      java.srcDirs = ['src']
+      resources.srcDirs = ['src']
+      res.srcDirs = ['res']
+      aidl.srcDirs = ['src']
+    }
+  }
+}
+
+6. Edit ftc_app-master/settings.gradle
+
+include ':libraries:opencv'
+
+7. Restart Android Studio ftc_app-master project
+
+8. Select >Tools>Android>Sync Project with Gradle Files
+
+9. Select F4 or Open Module Settings
+
+10. In FtcRobotController dependencies add module dependency :libraries:opencv
+
+11. Edit FtcRobotController/manifest/AndroidManifest.xml - add:
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.front" />
+    <uses-feature android:name="android.hardware.camera.front.autofocus" android:required="false"/>
+
+12. Edit FtcRobotController/res/layout/activity_ftc_controller.xml add:
+
+- Add opencv namespace:
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:opencv="http://schemas.android.com/apk/res-auto"
+
+- Add layout:
+
+      <org.opencv.android.JavaCameraView
+          android:layout_width="266dp"
+          android:layout_height="200dp"
+          android:layout_below="@+id/textErrorMessage"
+          android:layout_centerHorizontal="true"
+          android:visibility="gone"
+          android:id="@+id/openCVLayout"
+          opencv:show_fps="true"
+          opencv:camera_id="front" />
+
+13. Edit FtcRobotControllerActivity.java
+
